@@ -83,18 +83,16 @@
         <!-- Dashboard Content -->
         <div *ngIf="selectedMenuItem === 'dashboard'" class="dashboard-content">
           <nz-card nzTitle="Lista de Divisiones" class="divisions-card">
-            <!-- Encabezado con botón para crear nueva división -->
-            <div nz-card-extra>
-              <button nz-button nzType="primary" (click)="showCreateModal()">
-                <span nz-icon nzType="plus"></span>
-                Nueva División
-              </button>
-            </div>
-
             <!-- Sección de filtros -->
             <div class="filters-section">
               <div class="filters-container">
-                <h4>Filtros de búsqueda</h4>
+                <div class="filters-header">
+                  <h4>Filtros de búsqueda</h4>
+                  <button nz-button nzType="primary" (click)="showCreateModal()">
+                    <span nz-icon nzType="plus"></span>
+                    Nueva División
+                  </button>
+                </div>
                 <div class="filter-inputs">
                   <div class="filter-group">
                     <label>Nombre:</label>
@@ -102,7 +100,7 @@
                       nz-input
                       placeholder="Buscar por nombre..."
                       [value]="filterName()"
-                      (input)="onNameFilterChange($event.target.value)"
+                      (input)="onNameFilterChange($any($event.target).value)"
                       class="filter-input"
                     />
                   </div>
@@ -306,7 +304,7 @@
                       <span class="text-muted">--</span>
                     </td>
                     <td>
-                      <div class="action-buttons">
+                      <!-- <div class="action-buttons">
                         <button
                           nz-button
                           nzType="primary"
@@ -328,7 +326,8 @@
                         >
                           <span nz-icon nzType="delete" nzTheme="outline"></span>
                         </button>
-                      </div>
+                      </div> -->
+                      ---
                     </td>
                   </tr>
                 </ng-container>
