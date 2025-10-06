@@ -170,7 +170,6 @@ export class DashboardService {
       this.logout();
       return throwError(() => new Error('No token available'));
     }
-console.log('Datos para actualizar división:', divisionData);
     return this.http.put(`${environment.API_URL}/divisions/${divisionId}`, divisionData, {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -294,12 +294,24 @@ export default class Dashboard {
     this.editingDivision = division;
     this.isEditModalVisible = true;
     
+    console.log('División a editar:', division);
+    console.log('Nivel original:', division.level, 'tipo:', typeof division.level);
+    
     // Llenar el formulario con los datos actuales de la división
-    this.editDivisionForm.patchValue({
+    const formValues = {
       name: division.name,
-      level: division.level,
+      level: Number(division.level), // Asegurar que sea número
       parentId: division.parentId
-    });
+    };
+    
+    console.log('Valores del formulario:', formValues);
+    
+    this.editDivisionForm.patchValue(formValues);
+    
+    // Verificar que se haya asignado correctamente
+    setTimeout(() => {
+      console.log('Valor actual del formulario:', this.editDivisionForm.value);
+    }, 100);
   }
 
   handleEditCancel(): void {
