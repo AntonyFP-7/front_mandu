@@ -57,33 +57,37 @@ export default class ModalCreate {
   // Métodos para el modal de crear división
   handleCancel(): void {
     this.visibilityChange.emit(false);
+    // Resetear el formulario cuando se cancela
+    this.resetForm();
+  }
+
+  handleOk(): void {
+    if (this.createDivisionForm.valid) {
+      const formData = this.createDivisionForm.value;
+      console.log('Formulario válido, enviando datos:', formData);
+
+      // Emitir el evento con los datos del formulario
+      // NO cerrar el modal aquí - dejar que el componente padre decida
+      this.divisionCreated.emit(formData);
+      
+      // NO ejecutar visibilityChange.emit(false) ni reset aquí
+      // El dashboard se encargará de cerrar el modal solo si es exitoso
+    } else {
+      // Marcar todos los campos como touched para mostrar errores
+      console.log('Formulario inválido, mostrando errores');
+      Object.values(this.createDivisionForm.controls).forEach((control) => {
+        control.markAsTouched();
+      });
+    }
+  }
+
+  // Método público para resetear el formulario desde el componente padre
+  public resetForm(): void {
     this.createDivisionForm.reset({
       name: '',
       level: 1,
       parentId: null,
       ambassadorId: null,
     });
-  }
-
-  handleOk(): void {
-    if (this.createDivisionForm.valid) {
-      const formData = this.createDivisionForm.value;
-
-      // Emitir el evento con los datos del formulario
-      this.divisionCreated.emit(formData);
-      
-      this.visibilityChange.emit(false);
-      this.createDivisionForm.reset({
-        name: '',
-        level: 1,
-        parentId: null,
-        ambassadorId: null,
-      });
-    } else {
-      // Marcar todos los campos como touched para mostrar errores
-      Object.values(this.createDivisionForm.controls).forEach((control) => {
-        control.markAsTouched();
-      });
-    }
   }
 }

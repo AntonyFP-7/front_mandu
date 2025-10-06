@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from './services/dashboard.service';
 import ModalCreate from '../modal-create/modal-create';
@@ -120,6 +120,7 @@ export default class Dashboard {
 
   // Modal para crear división
   isCreateModalVisible = false;
+  @ViewChild(ModalCreate) modalCreateComponent!: ModalCreate;
 
   // Método para cargar divisiones inicialmente
   private loadDivisions(): void {
@@ -193,16 +194,21 @@ export default class Dashboard {
         // Refrescar la lista de divisiones
         this.refreshDivisions();
         
-        // Cerrar el modal
+        // Cerrar el modal y resetear formulario solo cuando es exitoso
         this.isCreateModalVisible = false;
+        this.modalCreateComponent.resetForm();
       },
       error: (error) => {
         console.log('Error al crear la división:', error);
-        this.message.error('Error al crear la división. Por favor, intenta nuevamente.');
-        //determino estatus de la consulta si es 401 cierro sesión
+        this.message.error(error.error.message || 'Error al crear la división. Por favor, intenta nuevamente.');
+        
+        // Solo cerrar sesión si es error 401 (token inválido)
         if (error.status === 401) {
-          //this.logout();
+          this.logout();
+          this.isCreateModalVisible = false;
+          this.modalCreateComponent.resetForm();
         }
+        // Para otros errores, el modal permanece abierto y el formulario mantiene los datos
       },
     });
   }
