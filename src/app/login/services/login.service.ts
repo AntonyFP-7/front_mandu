@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
 import { tap } from 'rxjs';
 import { StorageService } from './storage.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
