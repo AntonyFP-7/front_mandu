@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { DashboardService } from './services/dashboard.service';
 import ModalCreate from '../modal-create/modal-create';
 import { signal, WritableSignal } from '@angular/core';
@@ -91,6 +91,7 @@ interface Division {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     ModalCreate,
     NzCardModule,
     NzTableModule,
@@ -164,6 +165,10 @@ export default class Dashboard {
   // Direcciones de ordenamiento permitidas
   sortDirections: NzTableSortOrder[] = ['ascend', 'descend', null];
 
+  // Sistema de filtros
+  filterName = signal('');
+  filterLevel = signal<number | null>(null);
+
   // Método para cargar divisiones inicialmente
   private loadDivisions(): void {
     this.dashboardService.getDivisions().subscribe({
@@ -182,14 +187,34 @@ export default class Dashboard {
     this.loadDivisions();
   }
 
-  // Función computed para obtener divisiones ordenadas
+  // Función computed para obtener divisiones filtradas y ordenadas
   sortedDivisions = () => {
     const data = this.divisions();
     if (!data || data.length === 0) return [];
     
-    if (!this.currentSortColumn) return data;
+    // Aplicar filtros
+    let filteredData = data;
     
-    const sorted = [...data].sort((a, b) => {
+    // Filtro por nombre
+    const nameFilter = this.filterName().trim().toLowerCase();
+    if (nameFilter) {
+      filteredData = filteredData.filter(division => 
+        division.name.toLowerCase().includes(nameFilter)
+      );
+    }
+    
+    // Filtro por nivel
+    const levelFilter = this.filterLevel();
+    if (levelFilter !== null) {
+      filteredData = filteredData.filter(division => 
+        division.level === levelFilter
+      );
+    }
+    
+    // Aplicar ordenamiento si hay columna seleccionada
+    if (!this.currentSortColumn) return filteredData;
+    
+    const sorted = [...filteredData].sort((a, b) => {
       let result = 0;
       
       switch (this.currentSortColumn) {
@@ -249,18 +274,6 @@ export default class Dashboard {
   // Método para cerrar sesión
   logout(): void {
     this.dashboardService.logout();
-  }
-
-  // Método para ir a mensajes
-  goToMessages(): void {
-    console.log('Ir a mensajes');
-  }
-
-  // Método para ir a notificaciones
-  goToNotifications(): void {
-    console.log('Ir a notificaciones');
-    // Resetear contador al hacer clic
-    this.notificationCount = 0;
   }
 
   // Métodos para el modal de crear división
@@ -510,5 +523,19 @@ export default class Dashboard {
     }
     
     console.log(`Ordenando por ${column}: ${order}`);
+  }
+
+  // Métodos para manejar filtros
+  onNameFilterChange(value: string): void {
+    this.filterName.set(value);
+  }
+
+  onLevelFilterChange(value: number | null): void {
+    this.filterLevel.set(value);
+  }
+
+  clearFilters(): void {
+    this.filterName.set('');
+    this.filterLevel.set(null);
   }
 }

@@ -36,13 +36,13 @@
         <!-- Iconos de mensajes y notificaciones -->
         <div class="header-icons">
           <nz-badge [nzCount]="messageCount" nzSize="small">
-            <button nz-button nzType="text" nzSize="large" (click)="goToMessages()">
+            <button nz-button nzType="text" nzSize="large" >
               <span nz-icon nzType="message" nzTheme="outline"></span>
             </button>
           </nz-badge>
 
           <nz-badge [nzCount]="notificationCount" nzSize="small">
-            <button nz-button nzType="text" nzSize="large" (click)="goToNotifications()">
+            <button nz-button nzType="text" nzSize="large">
               <span nz-icon nzType="bell" nzTheme="outline"></span>
             </button>
           </nz-badge>
@@ -89,6 +89,47 @@
                 <span nz-icon nzType="plus"></span>
                 Nueva División
               </button>
+            </div>
+
+            <!-- Sección de filtros -->
+            <div class="filters-section">
+              <div class="filters-container">
+                <h4>Filtros de búsqueda</h4>
+                <div class="filter-inputs">
+                  <div class="filter-group">
+                    <label>Nombre:</label>
+                    <input
+                      nz-input
+                      placeholder="Buscar por nombre..."
+                      [value]="filterName()"
+                      (input)="onNameFilterChange($event.target.value)"
+                      class="filter-input"
+                    />
+                  </div>
+                  <div class="filter-group">
+                    <label>Nivel:</label>
+                    <nz-select
+                      nzPlaceHolder="Seleccionar nivel"
+                      nzAllowClear
+                      [ngModel]="filterLevel()"
+                      (ngModelChange)="onLevelFilterChange($event)"
+                      class="filter-select"
+                    >
+                      <nz-option [nzValue]="1" nzLabel="Nivel 1"></nz-option>
+                      <nz-option [nzValue]="2" nzLabel="Nivel 2"></nz-option>
+                      <nz-option [nzValue]="3" nzLabel="Nivel 3"></nz-option>
+                      <nz-option [nzValue]="4" nzLabel="Nivel 4"></nz-option>
+                      <nz-option [nzValue]="5" nzLabel="Nivel 5"></nz-option>
+                    </nz-select>
+                  </div>
+                  <div class="filter-actions">
+                    <button nz-button nzType="default" (click)="clearFilters()">
+                      <span nz-icon nzType="clear"></span>
+                      Limpiar
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <nz-table #divisionsTable [nzData]="sortedDivisions() || []" nzSize="middle">

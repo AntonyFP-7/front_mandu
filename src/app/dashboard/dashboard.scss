@@ -245,6 +245,61 @@ $hover-color: #f5f5f5;
   }
 }
 
+// Filters section styles
+.filters-section {
+  margin-bottom: 24px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 16px;
+
+  .filters-container {
+    h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .filter-inputs {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 200px;
+
+        label {
+          font-size: 12px;
+          color: #666;
+          font-weight: 500;
+        }
+
+        .filter-input,
+        .filter-select {
+          width: 100%;
+        }
+      }
+
+      .filter-actions {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+
+        button {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+      }
+    }
+  }
+}
+
 // Table improvements
 .ant-table {
   .text-muted {
