@@ -3,7 +3,7 @@ import Login from "../login";
 
 export default [
     {
-        path: 'login',
+        path: '',
         component: Login
     }
 ] as Routes;

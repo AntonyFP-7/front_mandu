@@ -3,7 +3,7 @@ import Dashboard from "../dashboard";
 
 export default [
     {
-        path: 'dashboard',
+        path: '',
        component: Dashboard
     }
 ] as Routes;
