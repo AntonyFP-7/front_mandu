@@ -48,7 +48,7 @@ export default class ModalCreate {
 
   constructor() {
     this.createDivisionForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(45)]],
       level: [1, [Validators.required, Validators.min(1), Validators.max(5)]],
       parentId: [null],
       ambassadorId: [null],
@@ -69,7 +69,7 @@ export default class ModalCreate {
       // Emitir el evento con los datos del formulario
       // NO cerrar el modal aquí - dejar que el componente padre decida
       this.divisionCreated.emit(formData);
-      
+
       // NO ejecutar visibilityChange.emit(false) ni reset aquí
       // El dashboard se encargará de cerrar el modal solo si es exitoso
     } else {

@@ -65,6 +65,7 @@ interface DivisionChild {
   ambassadorId: number | null;
   createdAt: string;
   updatedAt: string;
+  deleting?: boolean; // Propiedad opcional para manejar estado de loading
 }
 
 // Interfaz principal para las divisiones
@@ -82,6 +83,7 @@ interface Division {
   children: DivisionChild[];
   employees: Employee[];
   deleting?: boolean; // Propiedad opcional para manejar estado de loading
+  showSubdivisions?: boolean; // Propiedad para mostrar/ocultar subdivisiones
 }
 
 @Component({
@@ -118,7 +120,7 @@ export default class Dashboard {
     
     // Inicializar formulario de edición
     this.editDivisionForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [Validators.required, Validators.minLength(3),Validators.maxLength(45)]],
       level: [1, [Validators.required, Validators.min(1), Validators.max(5)]],
       parentId: [null]
     });
@@ -384,5 +386,51 @@ export default class Dashboard {
       
       return true;
     });
+  }
+
+  // Método para mostrar/ocultar subdivisiones
+  toggleSubdivisions(division: Division): void {
+    division.showSubdivisions = !division.showSubdivisions;
+    console.log(`Subdivisiones de "${division.name}" ${division.showSubdivisions ? 'mostradas' : 'ocultadas'}`);
+  }
+
+  // Métodos adaptadores para manejar subdivisiones
+  showEditModalForChild(child: DivisionChild): void {
+    // Convertir DivisionChild a Division para editar
+    const divisionToEdit: Division = {
+      id: child.id,
+      name: child.name,
+      level: child.level,
+      status: child.status,
+      parentId: child.parentId,
+      ambassadorId: child.ambassadorId,
+      createdAt: child.createdAt,
+      updatedAt: child.updatedAt,
+      ambassador: null,
+      parent: null,
+      children: [],
+      employees: []
+    };
+    this.showEditModal(divisionToEdit);
+  }
+
+  confirmDeleteChildDivision(child: DivisionChild): void {
+    // Convertir DivisionChild a Division para eliminar
+    const divisionToDelete: Division = {
+      id: child.id,
+      name: child.name,
+      level: child.level,
+      status: child.status,
+      parentId: child.parentId,
+      ambassadorId: child.ambassadorId,
+      createdAt: child.createdAt,
+      updatedAt: child.updatedAt,
+      ambassador: null,
+      parent: null,
+      children: [],
+      employees: [],
+      deleting: child.deleting
+    };
+    this.confirmDeleteDivision(divisionToDelete);
   }
 }

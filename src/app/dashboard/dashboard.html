@@ -104,67 +104,151 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let division of divisionsTable.data">
-                  <td>
-                    <strong>{{ division.name }}</strong>
-                  </td>
-                  <td>
-                    <span *ngIf="division.parent; else noParent">
-                      {{ division.parent.name }}
-                    </span>
-                    <ng-template #noParent>
+                <ng-container *ngFor="let division of divisionsTable.data">
+                  <!-- Fila principal de la división -->
+                  <tr>
+                    <td>
+                      <strong>{{ division.name }}</strong>
+                    </td>
+                    <td>
+                      <span *ngIf="division.parent; else noParent">
+                        {{ division.parent.name }}
+                      </span>
+                      <ng-template #noParent>
+                        <span class="text-muted">--</span>
+                      </ng-template>
+                    </td>
+                    <td>
+                      <nz-tag [nzColor]="getEmployeeCountColor(division.employees.length || 0)">
+                        {{ division.employees.length || 0 }}
+                      </nz-tag>
+                    </td>
+                    <td>
+                      <nz-tag [nzColor]="getLevelColor(division.level)">
+                        Nivel {{ division.level }}
+                      </nz-tag>
+                    </td>
+                    <td>
+                      <div class="subdivision-cell">
+                        <nz-tag [nzColor]="getSubdivisionCountColor(division.children.length || 0)">
+                          {{ division.children.length || 0 }}
+                        </nz-tag>
+
+                        <!-- Botón para mostrar subdivisiones si las hay -->
+                        <button
+                          *ngIf="division.children && division.children.length > 0"
+                          nz-button
+                          nzType="text"
+                          nzSize="small"
+                          (click)="toggleSubdivisions(division)"
+                          nz-tooltip="{{
+                            division.showSubdivisions ? 'Ocultar' : 'Mostrar'
+                          }} subdivisiones"
+                          style="margin-left: 8px"
+                        >
+                          <span
+                            nz-icon
+                            [nzType]="division.showSubdivisions ? 'up' : 'down'"
+                            nzTheme="outline"
+                          ></span>
+                        </button>
+                      </div>
+                    </td>
+                    <td>
+                      <span *ngIf="division.ambassador; else noAmbassador">
+                        {{ division.ambassador.fullName }}
+                      </span>
+                      <ng-template #noAmbassador>
+                        <span class="text-muted">Sin embajador</span>
+                      </ng-template>
+                    </td>
+                    <td>
+                      <div class="action-buttons">
+                        <button
+                          nz-button
+                          nzType="primary"
+                          nzSize="small"
+                          (click)="showEditModal(division)"
+                          nz-tooltip="Editar división"
+                          style="margin-right: 8px"
+                        >
+                          <span nz-icon nzType="edit" nzTheme="outline"></span>
+                        </button>
+                        <button
+                          nz-button
+                          nzType="primary"
+                          nzDanger
+                          nzSize="small"
+                          (click)="confirmDeleteDivision(division)"
+                          [nzLoading]="division.deleting"
+                          nz-tooltip="Eliminar división"
+                        >
+                          <span nz-icon nzType="delete" nzTheme="outline"></span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Filas de subdivisiones (expandibles) -->
+                  <tr
+                    *ngFor="let child of division.children"
+                    class="subdivision-row"
+                    [style.display]="division.showSubdivisions ? 'table-row' : 'none'"
+                  >
+                    <td class="subdivision-name">
+                      <span class="subdivision-indent">└─</span>
+                      <strong>{{ child.name }}</strong>
+                    </td>
+                    <td>
+                      <span class="subdivision-parent">{{ division.name }}</span>
+                    </td>
+                    <td>
+                      <nz-tag nzColor="blue">
+                        0
+                        <!-- Las subdivisiones generalmente no tienen empleados directos -->
+                      </nz-tag>
+                    </td>
+                    <td>
+                      <nz-tag [nzColor]="getLevelColor(child.level)">
+                        Nivel {{ child.level }}
+                      </nz-tag>
+                    </td>
+                    <td>
+                      <nz-tag nzColor="default">
+                        0
+                        <!-- Por simplicidad, no mostramos sub-subdivisiones por ahora -->
+                      </nz-tag>
+                    </td>
+                    <td>
                       <span class="text-muted">--</span>
-                    </ng-template>
-                  </td>
-                  <td>
-                    <nz-tag [nzColor]="getEmployeeCountColor(division.employees.length || 0)">
-                      {{ division.employees.length || 0 }}
-                    </nz-tag>
-                  </td>
-                  <td>
-                    <nz-tag [nzColor]="getLevelColor(division.level)">
-                      Nivel {{ division.level }}
-                    </nz-tag>
-                  </td>
-                  <td>
-                    <nz-tag [nzColor]="getSubdivisionCountColor(division.children.length || 0)">
-                      {{ division.children.length || 0 }}
-                    </nz-tag>
-                  </td>
-                  <td>
-                    <span *ngIf="division.ambassador; else noAmbassador">
-                      {{ division.ambassador.fullName }}
-                    </span>
-                    <ng-template #noAmbassador>
-                      <span class="text-muted">Sin embajador</span>
-                    </ng-template>
-                  </td>
-                  <td>
-                    <div class="action-buttons">
-                      <button 
-                        nz-button 
-                        nzType="primary" 
-                        nzSize="small"
-                        (click)="showEditModal(division)"
-                        nz-tooltip="Editar división"
-                        style="margin-right: 8px;"
-                      >
-                        <span nz-icon nzType="edit" nzTheme="outline"></span>
-                      </button>
-                      <button 
-                        nz-button 
-                        nzType="primary" 
-                        nzDanger 
-                        nzSize="small"
-                        (click)="confirmDeleteDivision(division)"
-                        [nzLoading]="division.deleting"
-                        nz-tooltip="Eliminar división"
-                      >
-                        <span nz-icon nzType="delete" nzTheme="outline"></span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                    </td>
+                    <td>
+                      <div class="action-buttons">
+                        <button
+                          nz-button
+                          nzType="primary"
+                          nzSize="small"
+                          (click)="showEditModalForChild(child)"
+                          nz-tooltip="Editar subdivisión"
+                          style="margin-right: 8px"
+                        >
+                          <span nz-icon nzType="edit" nzTheme="outline"></span>
+                        </button>
+                        <button
+                          nz-button
+                          nzType="primary"
+                          nzDanger
+                          nzSize="small"
+                          (click)="confirmDeleteChildDivision(child)"
+                          [nzLoading]="child.deleting"
+                          nz-tooltip="Eliminar subdivisión"
+                        >
+                          <span nz-icon nzType="delete" nzTheme="outline"></span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
               </tbody>
             </nz-table>
           </nz-card>
@@ -212,7 +296,9 @@
         <!-- Nombre de la división -->
         <nz-form-item>
           <nz-form-label nzRequired>Nombre de la División</nz-form-label>
-          <nz-form-control nzErrorTip="El nombre es requerido y debe tener al menos 3 caracteres">
+          <nz-form-control
+            nzErrorTip="El nombre es requerido y debe tener al menos 3 caracteres y no superar 45 caracteres"
+          >
             <input nz-input formControlName="name" placeholder="Ingrese el nombre de la división" />
           </nz-form-control>
         </nz-form-item>
