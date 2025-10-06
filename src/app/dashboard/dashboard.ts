@@ -126,7 +126,6 @@ export default class Dashboard {
     this.createDivisionForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       level: [1, [Validators.required, Validators.min(1), Validators.max(5)]],
-      status: [true],
       parentId: [null],
       ambassadorId: [null]
     });
@@ -145,11 +144,6 @@ export default class Dashboard {
     return divisionsList.filter(div => div.ambassador).length;
   }
 
-  get activeDivisions(): number {
-    const divisionsList = this.divisions();
-    if (!divisionsList) return 0;
-    return divisionsList.filter(div => div.status).length;
-  }
 
   // Método para seleccionar item del menú
   selectMenuItem(item: string): void {
@@ -184,7 +178,6 @@ export default class Dashboard {
     this.createDivisionForm.reset({
       name: '',
       level: 1,
-      status: true,
       parentId: null,
       ambassadorId: null
     });
@@ -202,7 +195,6 @@ export default class Dashboard {
       this.createDivisionForm.reset({
         name: '',
         level: 1,
-        status: true,
         parentId: null,
         ambassadorId: null
       });
