@@ -268,7 +268,6 @@ export default class Dashboard {
   // Método para seleccionar item del menú
   selectMenuItem(item: string): void {
     this.selectedMenuItem = item;
-    console.log('Menú seleccionado:', item);
   }
 
   // Método para cerrar sesión
@@ -299,7 +298,6 @@ export default class Dashboard {
         this.modalCreateComponent.resetForm();
       },
       error: (error) => {
-        console.log('Error al crear la división:', error);
         this.message.error(error.error.message || 'Error al crear la división. Por favor, intenta nuevamente.');
         
         // Solo cerrar sesión si es error 401 (token inválido)
