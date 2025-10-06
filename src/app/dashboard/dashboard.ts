@@ -8,6 +8,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 // Interfaces para la respuesta completa de la API
 interface Ambassador {
@@ -77,40 +78,13 @@ interface Division {
     NzAlertModule,
     NzButtonModule,
     NzIconModule,
-    NzTagModule
+    NzTagModule,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export default class Dashboard implements OnInit {
+export default class Dashboard {
   private dashboardService = inject(DashboardService);
-  
-  divisions: Division[] = [];
-  loading = false;
-  error: string | null = null;
 
-  ngOnInit() {
-    this.loadDivisions();
-  }
-
-  loadDivisions() {
-    this.loading = true;
-    this.error = null;
-    
-    this.dashboardService.getDivisions().subscribe({
-      next: (data) => {
-        this.divisions = data;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error al cargar divisiones:', error);
-        this.error = 'Error al cargar las divisiones. Por favor, intenta de nuevo.';
-        this.loading = false;
-      }
-    });
-  }
-
-  refreshDivisions() {
-    this.loadDivisions();
-  }
+  divisions = toSignal(this.dashboardService.getDivisions());
 }
