@@ -130,7 +130,16 @@
               </div>
             </div>
 
-            <nz-table #divisionsTable [nzData]="sortedDivisions() || []" nzSize="middle">
+            <nz-table 
+              #divisionsTable 
+              [nzData]="sortedDivisions() || []" 
+              nzSize="middle"
+              [nzFrontPagination]="true"
+              [nzPageSize]="10"
+              [nzPageSizeOptions]="[5, 10, 20, 50]"
+              [nzShowSizeChanger]="true"
+              [nzShowTotal]="totalTemplate"
+            >
               <thead>
                 <tr>
                   <th 
@@ -421,3 +430,8 @@
     </ng-container>
   </nz-modal>
 </nz-layout>
+
+<!-- Template para mostrar total de registros en paginación -->
+<ng-template #totalTemplate let-total let-range="range">
+  {{ range[0] }}-{{ range[1] }} de {{ total }} divisiones
+</ng-template>
