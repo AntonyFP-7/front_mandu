@@ -130,14 +130,15 @@
               </div>
             </div>
 
-            <nz-table 
-              #divisionsTable 
-              [nzData]="sortedDivisions() || []" 
-              nzSize="middle"
-              [nzFrontPagination]="true"
-              [nzPageSize]="10"
-              [nzPageSizeOptions]="[5, 10, 20, 50]"
-              [nzShowSizeChanger]="true"
+            <div class="table-responsive">
+              <nz-table 
+                #divisionsTable 
+                [nzData]="sortedDivisions() || []" 
+                nzSize="middle"
+                [nzFrontPagination]="true"
+                [nzPageSize]="10"
+                [nzPageSizeOptions]="[5, 10, 20, 50]"
+                [nzShowSizeChanger]="true"
               [nzShowTotal]="totalTemplate"
             >
               <thead>
@@ -342,6 +343,7 @@
                 </ng-container>
               </tbody>
             </nz-table>
+            </div>
           </nz-card>
         </div>
 
