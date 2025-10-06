@@ -91,15 +91,57 @@
               </button>
             </div>
 
-            <nz-table #divisionsTable [nzData]="divisions() || []" nzSize="middle">
+            <nz-table #divisionsTable [nzData]="sortedDivisions() || []" nzSize="middle">
               <thead>
                 <tr>
-                  <th>División</th>
-                  <th>División superior</th>
-                  <th>Colaboradores</th>
-                  <th>Nivel</th>
-                  <th>Subdivisiones</th>
-                  <th>Embajadores</th>
+                  <th 
+                    nzColumnKey="name" 
+                    [nzSortOrder]="sortOrder.name" 
+                    (nzSortOrderChange)="sort('name', $event)"
+                    [nzSortDirections]="sortDirections"
+                  >
+                    División
+                  </th>
+                  <th 
+                    nzColumnKey="parent" 
+                    [nzSortOrder]="sortOrder.parent" 
+                    (nzSortOrderChange)="sort('parent', $event)"
+                    [nzSortDirections]="sortDirections"
+                  >
+                    División superior
+                  </th>
+                  <th 
+                    nzColumnKey="employees" 
+                    [nzSortOrder]="sortOrder.employees" 
+                    (nzSortOrderChange)="sort('employees', $event)"
+                    [nzSortDirections]="sortDirections"
+                  >
+                    Colaboradores
+                  </th>
+                  <th 
+                    nzColumnKey="level" 
+                    [nzSortOrder]="sortOrder.level" 
+                    (nzSortOrderChange)="sort('level', $event)"
+                    [nzSortDirections]="sortDirections"
+                  >
+                    Nivel
+                  </th>
+                  <th 
+                    nzColumnKey="subdivisions" 
+                    [nzSortOrder]="sortOrder.subdivisions" 
+                    (nzSortOrderChange)="sort('subdivisions', $event)"
+                    [nzSortDirections]="sortDirections"
+                  >
+                    Subdivisiones
+                  </th>
+                  <th 
+                    nzColumnKey="ambassador" 
+                    [nzSortOrder]="sortOrder.ambassador" 
+                    (nzSortOrderChange)="sort('ambassador', $event)"
+                    [nzSortDirections]="sortDirections"
+                  >
+                    Embajadores
+                  </th>
                   <th>Acciones</th>
                 </tr>
               </thead>

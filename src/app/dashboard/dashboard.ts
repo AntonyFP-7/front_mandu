@@ -5,7 +5,7 @@ import { DashboardService } from './services/dashboard.service';
 import ModalCreate from '../modal-create/modal-create';
 import { signal, WritableSignal } from '@angular/core';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTableModule, NzTableSortOrder } from 'ng-zorro-antd/table';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -149,6 +149,21 @@ export default class Dashboard {
   editingDivision: Division | null = null;
   editLoading = false;
 
+  // Sistema de ordenamiento
+  sortOrder = {
+    name: null as 'ascend' | 'descend' | null,
+    parent: null as 'ascend' | 'descend' | null,
+    employees: null as 'ascend' | 'descend' | null,
+    level: null as 'ascend' | 'descend' | null,
+    subdivisions: null as 'ascend' | 'descend' | null,
+    ambassador: null as 'ascend' | 'descend' | null,
+  };
+  
+  currentSortColumn: string | null = null;
+  
+  // Direcciones de ordenamiento permitidas
+  sortDirections: NzTableSortOrder[] = ['ascend', 'descend', null];
+
   // Método para cargar divisiones inicialmente
   private loadDivisions(): void {
     this.dashboardService.getDivisions().subscribe({
@@ -166,6 +181,51 @@ export default class Dashboard {
   refreshDivisions(): void {
     this.loadDivisions();
   }
+
+  // Función computed para obtener divisiones ordenadas
+  sortedDivisions = () => {
+    const data = this.divisions();
+    if (!data || data.length === 0) return [];
+    
+    if (!this.currentSortColumn) return data;
+    
+    const sorted = [...data].sort((a, b) => {
+      let result = 0;
+      
+      switch (this.currentSortColumn) {
+        case 'name':
+          result = a.name.localeCompare(b.name);
+          break;
+        case 'parent':
+          const parentA = a.parent?.name || '';
+          const parentB = b.parent?.name || '';
+          result = parentA.localeCompare(parentB);
+          break;
+        case 'employees':
+          const employeesA = a.employees?.length || 0;
+          const employeesB = b.employees?.length || 0;
+          result = employeesA - employeesB;
+          break;
+        case 'level':
+          result = a.level - b.level;
+          break;
+        case 'subdivisions':
+          const subdivisionsA = a.children?.length || 0;
+          const subdivisionsB = b.children?.length || 0;
+          result = subdivisionsA - subdivisionsB;
+          break;
+        case 'ambassador':
+          const ambassadorA = a.ambassador?.fullName || '';
+          const ambassadorB = b.ambassador?.fullName || '';
+          result = ambassadorA.localeCompare(ambassadorB);
+          break;
+      }
+      
+      return this.sortOrder[this.currentSortColumn as keyof typeof this.sortOrder] === 'descend' ? -result : result;
+    });
+    
+    return sorted;
+  };
 
   // Computed properties para estadísticas
   get totalEmployees(): number {
@@ -432,5 +492,23 @@ export default class Dashboard {
       deleting: child.deleting
     };
     this.confirmDeleteDivision(divisionToDelete);
+  }
+
+  // Método para manejar cambios de ordenamiento
+  sort(column: string, order: NzTableSortOrder): void {
+    // Resetear todos los órdenes de ordenamiento
+    Object.keys(this.sortOrder).forEach(key => {
+      this.sortOrder[key as keyof typeof this.sortOrder] = null;
+    });
+    
+    // Establecer el nuevo orden
+    if (order === 'ascend' || order === 'descend') {
+      this.sortOrder[column as keyof typeof this.sortOrder] = order;
+      this.currentSortColumn = column;
+    } else {
+      this.currentSortColumn = null;
+    }
+    
+    console.log(`Ordenando por ${column}: ${order}`);
   }
 }
