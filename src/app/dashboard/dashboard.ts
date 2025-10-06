@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from './services/dashboard.service';
 import ModalCreate from '../modal-create/modal-create';
 import { signal, WritableSignal } from '@angular/core';
@@ -17,6 +18,9 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Router } from '@angular/router';
@@ -84,6 +88,7 @@ interface Division {
   selector: 'app-dashboard',
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     ModalCreate,
     NzCardModule,
     NzTableModule,
@@ -99,6 +104,9 @@ interface Division {
     NzBadgeModule,
     NzModalModule,
     NzTooltipModule,
+    NzFormModule,
+    NzInputModule,
+    NzSelectModule,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -107,9 +115,17 @@ export default class Dashboard {
   constructor(private message: NzMessageService, private _route: Router) {
     // Cargar divisiones al inicializar
     this.loadDivisions();
+    
+    // Inicializar formulario de edición
+    this.editDivisionForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      level: [1, [Validators.required, Validators.min(1), Validators.max(5)]],
+      parentId: [null]
+    });
   }
   
   private dashboardService = inject(DashboardService);
+  private fb = inject(FormBuilder);
 
   // Usar WritableSignal para poder actualizar manualmente
   divisions: WritableSignal<Division[]> = signal([]);
@@ -124,6 +140,12 @@ export default class Dashboard {
   // Modal para crear división
   isCreateModalVisible = false;
   @ViewChild(ModalCreate) modalCreateComponent!: ModalCreate;
+
+  // Modal para editar división
+  isEditModalVisible = false;
+  editDivisionForm: FormGroup;
+  editingDivision: Division | null = null;
+  editLoading = false;
 
   // Método para cargar divisiones inicialmente
   private loadDivisions(): void {
@@ -264,6 +286,91 @@ export default class Dashboard {
           this.logout();
         }
       },
+    });
+  }
+
+  // Métodos para editar división
+  showEditModal(division: Division): void {
+    this.editingDivision = division;
+    this.isEditModalVisible = true;
+    
+    // Llenar el formulario con los datos actuales de la división
+    this.editDivisionForm.patchValue({
+      name: division.name,
+      level: division.level,
+      parentId: division.parentId
+    });
+  }
+
+  handleEditCancel(): void {
+    this.isEditModalVisible = false;
+    this.editingDivision = null;
+    this.editDivisionForm.reset();
+  }
+
+  handleEditOk(): void {
+    if (this.editDivisionForm.valid && this.editingDivision) {
+      this.editLoading = true;
+      const formData = this.editDivisionForm.value;
+      
+      this.dashboardService.updateDivision(this.editingDivision.id, formData).subscribe({
+        next: (response: any) => {
+          this.message.success(`División "${formData.name}" actualizada exitosamente`);
+          
+          // Refrescar la lista de divisiones
+          this.refreshDivisions();
+          
+          // Cerrar el modal
+          this.isEditModalVisible = false;
+          this.editingDivision = null;
+          this.editLoading = false;
+          this.editDivisionForm.reset();
+        },
+        error: (error: any) => {
+          console.error('Error al actualizar división:', error);
+          this.editLoading = false;
+          
+          const errorMessage = error.error?.message || 'Error al actualizar la división. Por favor, intenta nuevamente.';
+          this.message.error(errorMessage);
+          
+          // Solo cerrar sesión si es error 401 (token inválido)
+          if (error.status === 401) {
+            this.logout();
+            this.isEditModalVisible = false;
+            this.editingDivision = null;
+          }
+          // Para otros errores, el modal permanece abierto
+        },
+      });
+    } else {
+      // Marcar todos los campos como touched para mostrar errores
+      Object.values(this.editDivisionForm.controls).forEach(control => {
+        control.markAsTouched();
+      });
+    }
+  }
+
+  // Método para obtener divisiones disponibles como padre (excluyendo la división actual y sus hijos)
+  getAvailableParentDivisions(): Division[] {
+    if (!this.editingDivision) {
+      return this.divisions() || [];
+    }
+    
+    const allDivisions = this.divisions() || [];
+    
+    // Filtrar la división actual y sus subdivisiones para evitar referencia circular
+    return allDivisions.filter(division => {
+      // No puede ser padre de sí misma
+      if (division.id === this.editingDivision!.id) {
+        return false;
+      }
+      
+      // No puede ser padre de una de sus subdivisiones
+      if (division.parentId === this.editingDivision!.id) {
+        return false;
+      }
+      
+      return true;
     });
   }
 }

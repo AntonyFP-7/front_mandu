@@ -140,17 +140,29 @@
                     </ng-template>
                   </td>
                   <td>
-                    <button 
-                      nz-button 
-                      nzType="primary" 
-                      nzDanger 
-                      nzSize="small"
-                      (click)="confirmDeleteDivision(division)"
-                      [nzLoading]="division.deleting"
-                      nz-tooltip="Eliminar división"
-                    >
-                      <span nz-icon nzType="delete" nzTheme="outline"></span>
-                    </button>
+                    <div class="action-buttons">
+                      <button 
+                        nz-button 
+                        nzType="primary" 
+                        nzSize="small"
+                        (click)="showEditModal(division)"
+                        nz-tooltip="Editar división"
+                        style="margin-right: 8px;"
+                      >
+                        <span nz-icon nzType="edit" nzTheme="outline"></span>
+                      </button>
+                      <button 
+                        nz-button 
+                        nzType="primary" 
+                        nzDanger 
+                        nzSize="small"
+                        (click)="confirmDeleteDivision(division)"
+                        [nzLoading]="division.deleting"
+                        nz-tooltip="Eliminar división"
+                      >
+                        <span nz-icon nzType="delete" nzTheme="outline"></span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -184,4 +196,60 @@
     (visibilityChange)="onModalVisibilityChange($event)"
     (divisionCreated)="onDivisionCreated($event)"
   ></app-modal-create>
+
+  <!-- Modal para editar división -->
+  <nz-modal
+    [(nzVisible)]="isEditModalVisible"
+    nzTitle="Editar División"
+    (nzOnCancel)="handleEditCancel()"
+    (nzOnOk)="handleEditOk()"
+    nzOkText="Actualizar"
+    nzCancelText="Cancelar"
+    [nzOkLoading]="editLoading"
+  >
+    <ng-container *nzModalContent>
+      <form nz-form [formGroup]="editDivisionForm" nzLayout="vertical" *ngIf="editDivisionForm">
+        <!-- Nombre de la división -->
+        <nz-form-item>
+          <nz-form-label nzRequired>Nombre de la División</nz-form-label>
+          <nz-form-control nzErrorTip="El nombre es requerido y debe tener al menos 3 caracteres">
+            <input nz-input formControlName="name" placeholder="Ingrese el nombre de la división" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Nivel -->
+        <nz-form-item>
+          <nz-form-label nzRequired>Nivel</nz-form-label>
+          <nz-form-control nzErrorTip="El nivel debe estar entre 1 y 5">
+            <nz-select formControlName="level" nzPlaceHolder="Seleccione el nivel">
+              <nz-option nzValue="1" nzLabel="Nivel 1"></nz-option>
+              <nz-option nzValue="2" nzLabel="Nivel 2"></nz-option>
+              <nz-option nzValue="3" nzLabel="Nivel 3"></nz-option>
+              <nz-option nzValue="4" nzLabel="Nivel 4"></nz-option>
+              <nz-option nzValue="5" nzLabel="Nivel 5"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- División Padre -->
+        <nz-form-item>
+          <nz-form-label>División Padre</nz-form-label>
+          <nz-form-control>
+            <nz-select
+              formControlName="parentId"
+              nzPlaceHolder="Seleccione división padre (opcional)"
+              nzAllowClear
+            >
+              <nz-option
+                *ngFor="let division of getAvailableParentDivisions()"
+                [nzValue]="division.id"
+                [nzLabel]="division.name"
+              >
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </ng-container>
+  </nz-modal>
 </nz-layout>

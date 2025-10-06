@@ -162,6 +162,38 @@ export class DashboardService {
     );
   }
 
+  updateDivision(divisionId: number, divisionData: any): Observable<any> {
+    const session = this.storage.get<{ token: string }>('session');
+    const token = session?.token || null;
+
+    if (!token) {
+      this.logout();
+      return throwError(() => new Error('No token available'));
+    }
+console.log('Datos para actualizar división:', divisionData);
+    return this.http.put(`${environment.API_URL}/divisions/${divisionId}`, divisionData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }).pipe(
+      tap((response) => {
+        console.log('División actualizada exitosamente:', response);
+      }),
+      catchError((error) => {
+        console.error('Error al actualizar división:', error);
+        
+        // Si es error 401 (Unauthorized), hacer logout
+        if (error.status === 401) {
+          console.log('Token expirado o inválido, cerrando sesión');
+          this.logout();
+        }
+
+        return throwError(() => error);
+      })
+    );
+  }
+
   logout() {
     this.storage.remove('session');
     this.router.navigate(['/login']);
