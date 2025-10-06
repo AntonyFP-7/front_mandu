@@ -1,17 +1,18 @@
 <div class="login-container">
   <nz-card [nzBordered]="true" nzTitle="Iniciar Sesión" class="centered-title-card">
-    <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
+    <form  nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <nz-form-item>
         <nz-form-control nzErrorTip="Por favor ingrese su correo electrónico!">
           <nz-input-group nzPrefixIcon="user">
-            <input type="email" nz-input formControlName="username" placeholder="Correo electrónico" />
+            <input type="email" nz-input  formControlName="email" 
+              id="email" placeholder="Correo electrónico" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
         <nz-form-control nzErrorTip="Por favor ingrese su contraseña!">
           <nz-input-group nzPrefixIcon="lock">
-            <input type="password" nz-input formControlName="password" placeholder="Contraseña" />
+            <input type="password" nz-input formControlName="password"  id="password" placeholder="Contraseña" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>

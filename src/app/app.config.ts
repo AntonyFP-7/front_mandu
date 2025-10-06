@@ -23,6 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(es_ES),
     provideAnimationsAsync(),
     provideHttpClient(),
-    provideNzIcons(icons)
+    provideNzIcons(icons),
+    provideHttpClient(),
   ]
 };
