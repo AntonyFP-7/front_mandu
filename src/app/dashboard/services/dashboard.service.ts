@@ -130,6 +130,38 @@ export class DashboardService {
       },
     });
   }
+
+  deleteDivision(divisionId: number): Observable<any> {
+    const session = this.storage.get<{ token: string }>('session');
+    const token = session?.token || null;
+
+    if (!token) {
+      this.logout();
+      return throwError(() => new Error('No token available'));
+    }
+
+    return this.http.delete(`${environment.API_URL}/divisions/${divisionId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).pipe(
+      tap((response) => {
+        console.log('División eliminada exitosamente:', response);
+      }),
+      catchError((error) => {
+        console.error('Error al eliminar división:', error);
+        
+        // Si es error 401 (Unauthorized), hacer logout
+        if (error.status === 401) {
+          console.log('Token expirado o inválido, cerrando sesión');
+          this.logout();
+        }
+
+        return throwError(() => error);
+      })
+    );
+  }
+
   logout() {
     this.storage.remove('session');
     this.router.navigate(['/login']);

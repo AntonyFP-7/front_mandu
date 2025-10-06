@@ -100,6 +100,7 @@
                   <th>Nivel</th>
                   <th>Subdivisiones</th>
                   <th>Embajadores</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,6 +138,19 @@
                     <ng-template #noAmbassador>
                       <span class="text-muted">Sin embajador</span>
                     </ng-template>
+                  </td>
+                  <td>
+                    <button 
+                      nz-button 
+                      nzType="primary" 
+                      nzDanger 
+                      nzSize="small"
+                      (click)="confirmDeleteDivision(division)"
+                      [nzLoading]="division.deleting"
+                      nz-tooltip="Eliminar división"
+                    >
+                      <span nz-icon nzType="delete" nzTheme="outline"></span>
+                    </button>
                   </td>
                 </tr>
               </tbody>

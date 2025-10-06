@@ -16,6 +16,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Router } from '@angular/router';
@@ -76,6 +77,7 @@ interface Division {
   parent: DivisionParent | null;
   children: DivisionChild[];
   employees: Employee[];
+  deleting?: boolean; // Propiedad opcional para manejar estado de loading
 }
 
 @Component({
@@ -96,6 +98,7 @@ interface Division {
     NzAvatarModule,
     NzBadgeModule,
     NzModalModule,
+    NzTooltipModule,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -231,5 +234,36 @@ export default class Dashboard {
     if (count <= 2) return 'blue';
     if (count <= 5) return 'green';
     return 'purple';
+  }
+
+  // Métodos para eliminar división
+  confirmDeleteDivision(division: Division): void {
+      this.deleteDivision(division);
+  }
+
+  deleteDivision(division: Division): void {
+    // Agregar flag de loading a la división
+    division.deleting = true;
+    
+    this.dashboardService.deleteDivision(division.id).subscribe({
+      next: (response: any) => {
+        this.message.success(`División "${division.name}" eliminada exitosamente`);
+        
+        // Refrescar la lista de divisiones
+        this.refreshDivisions();
+      },
+      error: (error: any) => {
+        console.error('Error al eliminar división:', error);
+        division.deleting = false; // Quitar loading en caso de error
+        
+        const errorMessage = error.error?.message || 'Error al eliminar la división. Por favor, intenta nuevamente.';
+        this.message.error(errorMessage);
+        
+        // Solo cerrar sesión si es error 401 (token inválido)
+        if (error.status === 401) {
+          this.logout();
+        }
+      },
+    });
   }
 }
