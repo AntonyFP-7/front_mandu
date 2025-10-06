@@ -8,23 +8,23 @@
         <div class="logo">
           <span>MANDÜ</span>
         </div>
-        
+
         <!-- Menús de navegación horizontales -->
-        <ul nz-menu 
-            nzMode="horizontal" 
-            nzTheme="light"
-            class="main-menu">
-          
-          <li nz-menu-item 
-              (click)="selectMenuItem('dashboard')"
-              [class.menu-selected]="selectedMenuItem === 'dashboard'">
+        <ul nz-menu nzMode="horizontal" nzTheme="light" class="main-menu">
+          <li
+            nz-menu-item
+            (click)="selectMenuItem('dashboard')"
+            [class.menu-selected]="selectedMenuItem === 'dashboard'"
+          >
             <span nz-icon nzType="dashboard"></span>
             <span>Dashboard</span>
           </li>
 
-          <li nz-menu-item 
-              (click)="selectMenuItem('organization')"
-              [class.menu-selected]="selectedMenuItem === 'organization'">
+          <li
+            nz-menu-item
+            (click)="selectMenuItem('organization')"
+            [class.menu-selected]="selectedMenuItem === 'organization'"
+          >
             <span nz-icon nzType="apartment"></span>
             <span>Organización</span>
           </li>
@@ -49,7 +49,12 @@
         </div>
 
         <!-- Dropdown del administrador -->
-        <div class="admin-dropdown" nz-dropdown [nzDropdownMenu]="adminMenu" nzPlacement="bottomRight">
+        <div
+          class="admin-dropdown"
+          nz-dropdown
+          [nzDropdownMenu]="adminMenu"
+          nzPlacement="bottomRight"
+        >
           <div class="admin-info">
             <nz-avatar nzIcon="user" nzSize="small"></nz-avatar>
             <span class="admin-name">Administrador</span>
@@ -66,7 +71,6 @@
             </li>
           </ul>
         </nz-dropdown-menu>
-        
       </div>
     </div>
   </nz-header>
@@ -74,10 +78,8 @@
   <!-- Contenido principal -->
   <nz-content class="main-content">
     <div class="dashboard-container">
-      
       <!-- Contenido según el menú seleccionado -->
       <div class="content-section">
-        
         <!-- Dashboard Content -->
         <div *ngIf="selectedMenuItem === 'dashboard'" class="dashboard-content">
           <nz-card nzTitle="Lista de Divisiones" class="divisions-card">
@@ -88,25 +90,35 @@
                 Nueva División
               </button>
             </div>
-            
+
             <nz-table #divisionsTable [nzData]="divisions() || []" nzSize="middle">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
+                  <th>División</th>
+                  <th>División superior</th>
+                  <th>Colaboradores</th>
                   <th>Nivel</th>
-                  <th>Estado</th>
-                  <th>Embajador</th>
-                  <th>División Padre</th>
-                  <th>Empleados</th>
                   <th>Subdivisiones</th>
+                  <th>Embajadores</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let division of divisionsTable.data">
-                  <td>{{ division.id }}</td>
                   <td>
                     <strong>{{ division.name }}</strong>
+                  </td>
+                  <td>
+                    <span *ngIf="division.parent; else noParent">
+                      {{ division.parent.name }}
+                    </span>
+                    <ng-template #noParent>
+                      <span class="text-muted">--</span>
+                    </ng-template>
+                  </td>
+                  <td>
+                    <nz-tag [nzColor]="getEmployeeCountColor(division.employees.length || 0)">
+                      {{ division.employees.length || 0 }}
+                    </nz-tag>
                   </td>
                   <td>
                     <nz-tag [nzColor]="getLevelColor(division.level)">
@@ -114,8 +126,8 @@
                     </nz-tag>
                   </td>
                   <td>
-                    <nz-tag [nzColor]="division.status ? 'green' : 'red'">
-                      {{ division.status ? 'Activa' : 'Inactiva' }}
+                    <nz-tag [nzColor]="getSubdivisionCountColor(division.children.length || 0)">
+                      {{ division.children.length || 0 }}
                     </nz-tag>
                   </td>
                   <td>
@@ -125,24 +137,6 @@
                     <ng-template #noAmbassador>
                       <span class="text-muted">Sin embajador</span>
                     </ng-template>
-                  </td>
-                  <td>
-                    <span *ngIf="division.parent; else noParent">
-                      {{ division.parent.name }}
-                    </span>
-                    <ng-template #noParent>
-                      <span class="text-muted">División raíz</span>
-                    </ng-template>
-                  </td>
-                  <td>
-                    <nz-tag [nzColor]="getEmployeeCountColor(division.employees.length || 0)">
-                      {{ division.employees.length || 0 }}
-                    </nz-tag>
-                  </td>
-                  <td>
-                    <nz-tag [nzColor]="getSubdivisionCountColor(division.children.length || 0)">
-                      {{ division.children.length || 0 }}
-                    </nz-tag>
                   </td>
                 </tr>
               </tbody>
@@ -154,13 +148,17 @@
         <div *ngIf="selectedMenuItem === 'organization'" class="organization-content">
           <nz-card nzTitle="Gestión de Organización" class="organization-card">
             <div class="organization-placeholder">
-              <span nz-icon nzType="apartment" nzTheme="outline" style="font-size: 48px; color: #ccc;"></span>
+              <span
+                nz-icon
+                nzType="apartment"
+                nzTheme="outline"
+                style="font-size: 48px; color: #ccc"
+              ></span>
               <h3>Módulo de Organización</h3>
               <p>Aquí se mostrará la gestión de la estructura organizacional</p>
             </div>
           </nz-card>
         </div>
-
       </div>
     </div>
   </nz-content>
@@ -172,18 +170,15 @@
     (nzOnCancel)="handleCancel()"
     (nzOnOk)="handleOk()"
     nzOkText="Crear"
-    nzCancelText="Cancelar">
-    
+    nzCancelText="Cancelar"
+  >
     <ng-container *nzModalContent>
       <form nz-form [formGroup]="createDivisionForm" nzLayout="vertical">
-        
         <!-- Nombre de la división -->
         <nz-form-item>
           <nz-form-label nzRequired>Nombre de la División</nz-form-label>
           <nz-form-control nzErrorTip="El nombre es requerido y debe tener al menos 3 caracteres">
-            <input nz-input 
-                   formControlName="name" 
-                   placeholder="Ingrese el nombre de la división"/>
+            <input nz-input formControlName="name" placeholder="Ingrese el nombre de la división" />
           </nz-form-control>
         </nz-form-item>
 
@@ -205,13 +200,16 @@
         <nz-form-item>
           <nz-form-label>División Padre</nz-form-label>
           <nz-form-control>
-            <nz-select formControlName="parentId" 
-                       nzPlaceHolder="Seleccione división padre (opcional)"
-                       nzAllowClear>
-              <nz-option 
-                *ngFor="let division of divisions()" 
-                [nzValue]="division.id" 
-                [nzLabel]="division.name">
+            <nz-select
+              formControlName="parentId"
+              nzPlaceHolder="Seleccione división padre (opcional)"
+              nzAllowClear
+            >
+              <nz-option
+                *ngFor="let division of divisions()"
+                [nzValue]="division.id"
+                [nzLabel]="division.name"
+              >
               </nz-option>
             </nz-select>
           </nz-form-control>
@@ -221,16 +219,15 @@
         <nz-form-item>
           <nz-form-label>Estado</nz-form-label>
           <nz-form-control>
-            <nz-switch 
+            <nz-switch
               formControlName="status"
               nzCheckedChildren="Activa"
-              nzUnCheckedChildren="Inactiva">
+              nzUnCheckedChildren="Inactiva"
+            >
             </nz-switch>
           </nz-form-control>
         </nz-form-item>
-
       </form>
     </ng-container>
   </nz-modal>
-
 </nz-layout>
