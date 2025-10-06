@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, NonNullableFormBuilder } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -15,31 +15,23 @@ import { NzMessageService } from 'ng-zorro-antd/message';
     NzInputModule,
     NzButtonModule,
     NzCardModule,
-    NzIconModule
+    NzIconModule,
   ],
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrl: './login.scss',
 })
 export default class Login {
-  loginForm: FormGroup;
+  private fb = inject(NonNullableFormBuilder);
+  validateForm = this.fb.group({
+    username: this.fb.control('', [Validators.required]),
+    password: this.fb.control('', [Validators.required, Validators.minLength(6)]),
+  });
 
-  constructor(
-    private fb: FormBuilder,
-    private message: NzMessageService
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
-
-  onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.message.success('¡Formulario válido! NgZorro está funcionando correctamente.');
-      console.log('Datos del formulario:', this.loginForm.value);
+  submitForm(): void {
+    if (this.validateForm.valid) {
+      console.log('submit', this.validateForm.value);
     } else {
-      this.message.error('Por favor, completa todos los campos correctamente.');
-      Object.values(this.loginForm.controls).forEach(control => {
+      Object.values(this.validateForm.controls).forEach((control) => {
         if (control.invalid) {
           control.markAsDirty();
           control.updateValueAndValidity({ onlySelf: true });

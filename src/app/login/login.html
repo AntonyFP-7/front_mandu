@@ -1,55 +1,23 @@
 <div class="login-container">
   <nz-card [nzBordered]="true" nzTitle="Iniciar Sesión" class="centered-title-card">
-    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      
-      <!-- Campo Email -->
+    <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
       <nz-form-item>
-        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="email">Email</nz-form-label>
-        <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Por favor ingresa un email válido">
+        <nz-form-control nzErrorTip="Por favor ingrese su correo electrónico!">
           <nz-input-group nzPrefixIcon="user">
-            <input 
-              nz-input 
-              formControlName="email" 
-              id="email" 
-              placeholder="ejemplo@correo.com"
-            />
+            <input type="email" nz-input formControlName="username" placeholder="Correo electrónico" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
-
-      <!-- Campo Password -->
       <nz-form-item>
-        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="password">Contraseña</nz-form-label>
-        <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="La contraseña debe tener al menos 6 caracteres">
+        <nz-form-control nzErrorTip="Por favor ingrese su contraseña!">
           <nz-input-group nzPrefixIcon="lock">
-            <input 
-              nz-input 
-              type="password" 
-              formControlName="password" 
-              id="password" 
-              placeholder="Contraseña"
-            />
+            <input type="password" nz-input formControlName="password" placeholder="Contraseña" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
-
-      <!-- Botón Submit -->
-      <nz-form-item>
-        <nz-form-control [nzOffset]="6" [nzSm]="14" [nzXs]="24">
-          <button 
-            nz-button 
-            nzType="primary" 
-            [nzSize]="'large'"
-            [nzLoading]="false"
-            [disabled]="!loginForm.valid"
-            class="login-button"
-          >
-            <span nz-icon nzType="login"></span>
-            Iniciar Sesión
-          </button>
-        </nz-form-control>
-      </nz-form-item>
-      
+      <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">
+        Iniciar sesión
+      </button>
     </form>
   </nz-card>
 </div>

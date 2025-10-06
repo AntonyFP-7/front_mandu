@@ -1,67 +1,114 @@
+// Contenedor principal para centrar la tarjeta
 .login-container {
-  max-width: 500px;
-  margin: 50px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  box-sizing: border-box;
+  
+  // Estilos para la tarjeta
+  .ant-card {
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    
+    // Centrar el contenido de la tarjeta
+    .ant-card-body {
+      padding: 24px;
+      text-align: center;
+    }
+  }
+}
+
+// Estilos del formulario
+.login-form {
+  max-width: 300px;
+  margin: 0 auto;
+  text-align: left; // Los inputs se alinean a la izquierda dentro del form centrado
+  
+  .login-form-margin {
+    margin-bottom: 16px;
+  }
+
+  .login-form-forgot {
+    float: right;
+    color: #1890ff;
+    
+    &:hover {
+      color: #40a9ff;
+    }
+  }
+
+  .login-form-button {
+    width: 100%;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    margin-top: 10px;
+  }
+  
+  // Centrar elementos del formulario
+  .ant-form-item {
+    margin-bottom: 16px;
+    
+    .ant-form-item-control {
+      text-align: center;
+      
+      .ant-input-group {
+        text-align: left;
+      }
+    }
+  }
+}
+
+// Estilos para centrar el título de la tarjeta
+.centered-title-card {
+  .ant-card-head {
+    text-align: center !important;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 24px;
+    
+    .ant-card-head-wrapper {
+      justify-content: center !important;
+      
+      .ant-card-head-title {
+        text-align: center !important;
+        color: #1890ff !important;
+        font-weight: 600 !important;
+        font-size: 20px !important;
+        margin: 0 !important;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .login-container {
+    padding: 10px;
+    
+    .ant-card {
+      max-width: 100%;
+      margin: 0 10px;
+      
+      .ant-card-body {
+        padding: 16px;
+      }
+    }
+  }
   
   .login-form {
-    margin-top: 20px;
-    
-    .login-button {
-      width: 100%;
-    }
-  }
-  
-  .info-card {
-    margin-top: 20px;
-    
-    p {
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
+    max-width: 100%;
   }
 }
 
-// Variables SCSS específicas para el login
-$login-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-$login-primary-color: #1890ff;
-
-.login-container {
-  .ant-card {
-    box-shadow: $login-card-shadow;
-    border-radius: 8px;
-    
-    .ant-card-head-title {
-      color: $login-primary-color;
-      font-weight: 600;
-    }
-  }
-  
-  // Clase para centrar el título de la tarjeta
-  .centered-title-card {
-    .ant-card-head {
-      text-align: center !important;
-      
-      .ant-card-head-wrapper {
-        justify-content: center !important;
-        
-        .ant-card-head-title {
-          text-align: center !important;
-          display: flex !important;
-          justify-content: center !important;
-          width: 100% !important;
-        }
-      }
-    }
-  }
-}
-
-// Regla adicional más específica para forzar el centrado
+// Estilos adicionales para centrado perfecto
 ::ng-deep .centered-title-card {
   .ant-card-head {
     text-align: center !important;
