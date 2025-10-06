@@ -85,23 +85,12 @@ export class DashboardService {
   constructor(private http: HttpClient, private storage: StorageService, private router: Router) {}
 
   getDivisions(): Observable<Division[]> {
-    const sessionData = this.storage.get<SessionData>('session');
-    
-    // Validar que la sesión existe
-    if (!sessionData) {
-      this.logout();
-      return of([]); // Retorna observable vacío
-    }
-    
-    // Extraer el token de la sesión
-    const { token } = sessionData;
-
-    // Validar que el token existe
+    const session = this.storage.get<{ token: string }>('session');
+    const token = session?.token || null;
     if (!token) {
       this.logout();
-      return of([]); // Retorna observable vacío
+      return of([]);
     }
-
 
     return this.http
       .get<Division[]>(`${environment.API_URL}/divisions`, {
@@ -114,19 +103,33 @@ export class DashboardService {
           console.log('Respuesta de divisiones:', response);
         }),
         catchError((error) => {
-          
           // Si es error 401 (Unauthorized), hacer logout
           if (error.status === 401) {
             console.log('Token expirado o inválido, cerrando sesión');
             this.logout();
           }
-          
+
           // Retornar array vacío en caso de error
           return of([]);
         })
       );
   }
+  createDivision(divisionData: any): Observable<any> {
+    const session = this.storage.get<{ token: string }>('session');
+    const token = session?.token || null;
 
+    if (!token) {
+      this.logout();
+      return throwError(() => new Error('No token available'));
+    }
+
+    return this.http.post(`${environment.API_URL}/divisions`, divisionData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+  }
   logout() {
     this.storage.remove('session');
     this.router.navigate(['/login']);

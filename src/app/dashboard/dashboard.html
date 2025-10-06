@@ -163,58 +163,11 @@
     </div>
   </nz-content>
 
-  <!-- Modal para crear nueva división -->
-  <nz-modal
-    [(nzVisible)]="isCreateModalVisible"
-    nzTitle="Crear Nueva División"
-    (nzOnCancel)="handleCancel()"
-    (nzOnOk)="handleOk()"
-    nzOkText="Crear"
-    nzCancelText="Cancelar"
-  >
-    <ng-container *nzModalContent>
-      <form nz-form [formGroup]="createDivisionForm" nzLayout="vertical">
-        <!-- Nombre de la división -->
-        <nz-form-item>
-          <nz-form-label nzRequired>Nombre de la División</nz-form-label>
-          <nz-form-control nzErrorTip="El nombre es requerido y debe tener al menos 3 caracteres">
-            <input nz-input formControlName="name" placeholder="Ingrese el nombre de la división" />
-          </nz-form-control>
-        </nz-form-item>
-
-        <!-- Nivel -->
-        <nz-form-item>
-          <nz-form-label nzRequired>Nivel</nz-form-label>
-          <nz-form-control nzErrorTip="El nivel debe estar entre 1 y 5">
-            <nz-select formControlName="level" nzPlaceHolder="Seleccione el nivel">
-              <nz-option nzValue="1" nzLabel="Nivel 1"></nz-option>
-              <nz-option nzValue="2" nzLabel="Nivel 2"></nz-option>
-              <nz-option nzValue="3" nzLabel="Nivel 3"></nz-option>
-              <nz-option nzValue="4" nzLabel="Nivel 4"></nz-option>
-              <nz-option nzValue="5" nzLabel="Nivel 5"></nz-option>
-            </nz-select>
-          </nz-form-control>
-        </nz-form-item>
-
-        <!-- División Padre -->
-        <nz-form-item>
-          <nz-form-label>División Padre</nz-form-label>
-          <nz-form-control>
-            <nz-select
-              formControlName="parentId"
-              nzPlaceHolder="Seleccione división padre (opcional)"
-              nzAllowClear
-            >
-              <nz-option
-                *ngFor="let division of divisions()"
-                [nzValue]="division.id"
-                [nzLabel]="division.name"
-              >
-              </nz-option>
-            </nz-select>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-    </ng-container>
-  </nz-modal>
+  <!-- Componente Modal para crear división -->
+  <app-modal-create
+    [isVisible]="isCreateModalVisible"
+    [divisions]="divisions() || []"
+    (visibilityChange)="onModalVisibilityChange($event)"
+    (divisionCreated)="onDivisionCreated($event)"
+  ></app-modal-create>
 </nz-layout>

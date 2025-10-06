@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from './services/dashboard.service';
+import ModalCreate from '../modal-create/modal-create';
+import { signal, WritableSignal } from '@angular/core';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
@@ -15,11 +16,9 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { Router } from '@angular/router';
 
 // Interfaces para la respuesta completa de la API
 interface Ambassador {
@@ -83,7 +82,7 @@ interface Division {
   selector: 'app-dashboard',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    ModalCreate,
     NzCardModule,
     NzTableModule,
     NzSpinModule,
@@ -97,38 +96,47 @@ interface Division {
     NzAvatarModule,
     NzBadgeModule,
     NzModalModule,
-    NzFormModule,
-    NzInputModule,
-    NzSelectModule,
-    NzSwitchModule,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export default class Dashboard {
-  private dashboardService = inject(DashboardService);
-  private fb = inject(FormBuilder);
-
-  divisions = toSignal(this.dashboardService.getDivisions());
+  constructor(private message: NzMessageService, private _route: Router) {
+    // Cargar divisiones al inicializar
+    this.loadDivisions();
+  }
   
+  private dashboardService = inject(DashboardService);
+
+  // Usar WritableSignal para poder actualizar manualmente
+  divisions: WritableSignal<Division[]> = signal([]);
+
   // Estado del menú seleccionado
   selectedMenuItem = 'dashboard';
-  
+
   // Contador de notificaciones (simulado)
   notificationCount = 3;
   messageCount = 5;
 
   // Modal para crear división
   isCreateModalVisible = false;
-  createDivisionForm: FormGroup;
 
-  constructor() {
-    this.createDivisionForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      level: [1, [Validators.required, Validators.min(1), Validators.max(5)]],
-      parentId: [null],
-      ambassadorId: [null]
+  // Método para cargar divisiones inicialmente
+  private loadDivisions(): void {
+    this.dashboardService.getDivisions().subscribe({
+      next: (divisionsData) => {
+        this.divisions.set(divisionsData);
+      },
+      error: (error) => {
+        console.error('Error al cargar divisiones:', error);
+        this.divisions.set([]);
+      }
     });
+  }
+
+  // Método para refrescar las divisiones
+  refreshDivisions(): void {
+    this.loadDivisions();
   }
 
   // Computed properties para estadísticas
@@ -141,9 +149,8 @@ export default class Dashboard {
   get totalAmbassadors(): number {
     const divisionsList = this.divisions();
     if (!divisionsList) return 0;
-    return divisionsList.filter(div => div.ambassador).length;
+    return divisionsList.filter((div) => div.ambassador).length;
   }
-
 
   // Método para seleccionar item del menú
   selectMenuItem(item: string): void {
@@ -173,37 +180,31 @@ export default class Dashboard {
     this.isCreateModalVisible = true;
   }
 
-  handleCancel(): void {
-    this.isCreateModalVisible = false;
-    this.createDivisionForm.reset({
-      name: '',
-      level: 1,
-      parentId: null,
-      ambassadorId: null
-    });
+  onModalVisibilityChange(visible: boolean): void {
+    this.isCreateModalVisible = visible;
   }
 
-  handleOk(): void {
-    if (this.createDivisionForm.valid) {
-      const formData = this.createDivisionForm.value;
-      console.log('Crear nueva división:', formData);
-      
-      // Aquí iría la llamada al servicio para crear la división
-      // this.dashboardService.createDivision(formData).subscribe(...)
-      
-      this.isCreateModalVisible = false;
-      this.createDivisionForm.reset({
-        name: '',
-        level: 1,
-        parentId: null,
-        ambassadorId: null
-      });
-    } else {
-      // Marcar todos los campos como touched para mostrar errores
-      Object.values(this.createDivisionForm.controls).forEach(control => {
-        control.markAsTouched();
-      });
-    }
+  onDivisionCreated(divisionData: any): void {
+    // Aquí llamo al servicio para crear la división
+    this.dashboardService.createDivision(divisionData).subscribe({
+      next: (response) => {
+        this.message.success('División creada exitosamente');
+        
+        // Refrescar la lista de divisiones
+        this.refreshDivisions();
+        
+        // Cerrar el modal
+        this.isCreateModalVisible = false;
+      },
+      error: (error) => {
+        console.log('Error al crear la división:', error);
+        this.message.error('Error al crear la división. Por favor, intenta nuevamente.');
+        //determino estatus de la consulta si es 401 cierro sesión
+        if (error.status === 401) {
+          //this.logout();
+        }
+      },
+    });
   }
 
   // Métodos helper para colores de las etiquetas
