@@ -90,4 +90,34 @@ export default class ModalCreate {
       ambassadorId: null,
     });
   }
+
+  // Métodos para obtener mensajes de error dinámicos
+  getNameErrorMessage(): string {
+    const nameControl = this.createDivisionForm.get('name');
+    if (!nameControl?.touched || !nameControl?.errors) return '';
+    
+    if (nameControl.errors['required']) {
+      return 'El nombre de la división es requerido';
+    }
+    if (nameControl.errors['minlength']) {
+      return 'El nombre debe tener al menos 3 caracteres';
+    }
+    if (nameControl.errors['maxlength']) {
+      return 'El nombre no puede superar 45 caracteres';
+    }
+    return '';
+  }
+
+  getLevelErrorMessage(): string {
+    const levelControl = this.createDivisionForm.get('level');
+    if (!levelControl?.touched || !levelControl?.errors) return '';
+    
+    if (levelControl.errors['required']) {
+      return 'El nivel es requerido';
+    }
+    if (levelControl.errors['min'] || levelControl.errors['max']) {
+      return 'El nivel debe estar entre 1 y 5';
+    }
+    return '';
+  }
 }

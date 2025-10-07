@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalCreate } from './modal-create';
+import ModalCreate from './modal-create';
 
 describe('ModalCreate', () => {
   let component: ModalCreate;

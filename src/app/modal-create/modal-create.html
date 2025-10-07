@@ -12,7 +12,11 @@
       <!-- Nombre de la división -->
       <nz-form-item>
         <nz-form-label nzRequired>Nombre de la División</nz-form-label>
-        <nz-form-control nzErrorTip="El nombre es requerido y debe tener al menos 3 caracteres  y no superar 45 caracteres">
+        <nz-form-control 
+          [nzHasFeedback]="true"
+          [nzValidateStatus]="createDivisionForm.get('name')?.invalid && createDivisionForm.get('name')?.touched ? 'error' : ''"
+          [nzErrorTip]="getNameErrorMessage()"
+        >
           <input nz-input formControlName="name" placeholder="Ingrese el nombre de la división" />
         </nz-form-control>
       </nz-form-item>
@@ -20,13 +24,17 @@
       <!-- Nivel -->
       <nz-form-item>
         <nz-form-label nzRequired>Nivel</nz-form-label>
-        <nz-form-control nzErrorTip="El nivel debe estar entre 1 y 5">
+        <nz-form-control 
+          [nzHasFeedback]="true"
+          [nzValidateStatus]="createDivisionForm.get('level')?.invalid && createDivisionForm.get('level')?.touched ? 'error' : ''"
+          [nzErrorTip]="getLevelErrorMessage()"
+        >
           <nz-select formControlName="level" nzPlaceHolder="Seleccione el nivel">
-            <nz-option nzValue="1" nzLabel="Nivel 1"></nz-option>
-            <nz-option nzValue="2" nzLabel="Nivel 2"></nz-option>
-            <nz-option nzValue="3" nzLabel="Nivel 3"></nz-option>
-            <nz-option nzValue="4" nzLabel="Nivel 4"></nz-option>
-            <nz-option nzValue="5" nzLabel="Nivel 5"></nz-option>
+            <nz-option [nzValue]="1" nzLabel="Nivel 1"></nz-option>
+            <nz-option [nzValue]="2" nzLabel="Nivel 2"></nz-option>
+            <nz-option [nzValue]="3" nzLabel="Nivel 3"></nz-option>
+            <nz-option [nzValue]="4" nzLabel="Nivel 4"></nz-option>
+            <nz-option [nzValue]="5" nzLabel="Nivel 5"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
